@@ -1,0 +1,7 @@
+---
+- hosts: win
+  tasks:
+    - name: Uninstall Chrome using Chocolatey
+      win_chocolatey:
+        name: googlechrome
+        state: absent

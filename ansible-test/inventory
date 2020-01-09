@@ -1,0 +1,8 @@
+acs ansible_host=192.168.33.10
+node ansible_host=192.168.33.50
+
+[win]
+node
+
+[linux]
+acs ansible_user=vagrant ansible_ssh_pass=vagrant

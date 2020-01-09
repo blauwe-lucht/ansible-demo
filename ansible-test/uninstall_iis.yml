@@ -1,0 +1,9 @@
+---
+- hosts: win
+  tasks:
+  - name: IIS is uninstalled
+    win_feature:
+      name: Web-Server
+      state: absent
+  - name: reboot to finish uninstall
+    win_reboot:

@@ -1,0 +1,70 @@
+---
+
+- hosts: win
+  tasks:
+  - name: Get hash of available version
+    script: scripts/get_available_version.ps1
+    register: available_hash
+  - debug: msg="{{ available_hash.stdout | trim }}"
+
+  - name: Get hash of installed version
+    script: scripts/get_installed_version.ps1
+    register: installed_hash
+  - debug: msg="{{ installed_hash.stdout | trim }}"
+
+  - set_fact:
+      is_update_needed: "{{ installed_hash.stdout|trim != available_hash.stdout|trim }}"
+  - debug: msg="{{ is_update_needed }}"
+
+  - name: Install tools
+    block:
+      - name: Create c:\tools
+        win_file:
+          path: c:\tools
+          state: directory
+
+      - name: Download tools.zip
+        win_get_url:
+          url: https://bitbucket.org/qurrent/vmwindowstools/raw/master/tools.zip
+          dest: C:\Windows\Temp\tools.zip
+
+      - name: Unzip tools.zip
+        win_unzip:
+          src: C:\Windows\Temp\tools.zip
+          dest: C:\
+          delete_archive: yes
+
+      - name: Create shortcut to TotalCommander for all users
+        win_shortcut:
+          description: TotalCommander
+          src: C:\tools\totalcmd\totalcmd.exe
+          dest: '%Public%\Desktop\TotalCommander.lnk'
+          icon: 'C:\tools\totalcmd\totalcmd.exe,0'
+          directory: C:\
+          hotkey: Ctrl+Alt+T
+
+      - name: Create shortcut to Notepad++ for all users
+        win_shortcut:
+          description: TotalCommander
+          src: C:\tools\Notepad++\notepad++.exe
+          dest: '%Public%\Desktop\Notepad++.lnk'
+          icon: 'C:\tools\Notepad++\notepad++.exe,0'
+          directory: C:\
+          hotkey: Ctrl+Alt+N
+
+      - name: Add Everyone full control over c:\tools
+        win_acl:
+          path: C:\tools
+          user: Everyone
+          rights: FullControl
+          type: allow
+          state: present
+
+      - set_fact:
+          installed_version: "{{ available_hash.stdout }}"
+
+      - name: Generate version file
+        template:
+          src: templates/tools_version.j2
+          dest: c:\tools\version
+    when: is_update_needed
