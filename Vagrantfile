@@ -8,7 +8,7 @@
 Vagrant.configure(2) do |config|
 
   config.vm.define "acs" do |acs|
-    acs.vm.box = "ubuntu/xenial64"
+    acs.vm.box = "ubuntu/focal64"
     acs.vm.hostname = "acs"
     acs.vm.network "private_network", ip: "192.168.33.10"
 	acs.vm.provision "shell", inline: "/vagrant/prepare-acs.sh"
