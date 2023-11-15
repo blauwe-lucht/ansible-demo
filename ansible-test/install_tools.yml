@@ -4,19 +4,32 @@
   tasks:
   - name: Get hash of available version
     script: scripts/get_available_version.ps1
+    changed_when: false
     register: available_hash
-  - debug: msg="{{ available_hash.stdout | trim }}"
+
+  - name: Show hash
+    debug:
+      msg: "{{ available_hash.stdout | trim }}"
 
   - name: Get hash of installed version
     script: scripts/get_installed_version.ps1
+    changed_when: false
     register: installed_hash
-  - debug: msg="{{ installed_hash.stdout | trim }}"
 
-  - set_fact:
+  - name: Show hash
+    debug:
+      msg: "{{ installed_hash.stdout | trim }}"
+
+  - name: Check if update is needed
+    set_fact:
       is_update_needed: "{{ installed_hash.stdout|trim != available_hash.stdout|trim }}"
-  - debug: msg="{{ is_update_needed }}"
+
+  - name: Show if update is needed
+    debug:
+      msg: "{{ is_update_needed }}"
 
   - name: Install tools
+    when: is_update_needed
     block:
       - name: Create c:\tools
         win_file:
@@ -32,7 +45,7 @@
         win_unzip:
           src: C:\Windows\Temp\tools.zip
           dest: C:\
-          delete_archive: yes
+          delete_archive: true
 
       - name: Create shortcut to TotalCommander for all users
         win_shortcut:
@@ -60,11 +73,12 @@
           type: allow
           state: present
 
-      - set_fact:
+      - name: Determine installed version
+        set_fact:
           installed_version: "{{ available_hash.stdout }}"
 
       - name: Generate version file
         template:
           src: templates/tools_version.j2
           dest: c:\tools\version
-    when: is_update_needed
+          mode: 0644
