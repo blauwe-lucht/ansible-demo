@@ -14,14 +14,16 @@ Vagrant.configure(2) do |config|
 	acs.vm.provision "shell", inline: "/vagrant/prepare-acs.sh"
   end
 
-  config.vm.define "win2016" do |win2016|
-    win2016.vm.box = "StefanScherer/windows_2016_docker"
-	win2016.vm.hostname = "win2016"
-	win2016.vm.network "private_network", ip: "192.168.33.50"
-	win2016.vm.communicator = "winrm"
-	win2016.winrm.username = "vagrant"
-	win2016.winrm.password = "vagrant"
-	win2016.vm.provider "virtualbox" do |vb|
+  config.vm.define "win" do |win|
+    win.vm.box = "StefanScherer/windows_2022"
+	win.vm.hostname = "win"
+	win.vm.network "private_network", ip: "192.168.33.50"
+	win.vm.communicator = "winrm"
+	win.winrm.username = "vagrant"
+	win.winrm.password = "vagrant"
+	win.winrm.max_tries = 100
+    win.winrm.retry_delay = 2
+	win.vm.provider "virtualbox" do |vb|
 	  vb.memory = 2048
 	  vb.cpus = 2
 	end
