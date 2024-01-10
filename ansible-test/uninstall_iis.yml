@@ -1,9 +1,11 @@
 ---
-- hosts: win
+- name: Uninstall IIS
+  hosts: win
   tasks:
-  - name: IIS is uninstalled
-    win_feature:
-      name: Web-Server
-      state: absent
-  - name: reboot to finish uninstall
-    win_reboot:
+    - name: IIS is uninstalled
+      ansible.windows.win_feature:
+        name: Web-Server
+        state: absent
+
+    - name: Reboot to finish uninstall
+      ansible.windows.win_reboot:

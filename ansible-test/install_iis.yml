@@ -1,4 +1,5 @@
 ---
-- hosts: win
+- name: Install IIS
+  hosts: win
   roles:
-    - win_webserver 
+    - win_webserver
