@@ -1,7 +1,8 @@
 ---
-- hosts: win
+- name: Install Chrome
+  hosts: win
   tasks:
     - name: Install Chrome using Chocolatey
-      win_chocolatey:
+      chocolatey.chocolatey.win_chocolatey:
         name: googlechrome
         state: present
